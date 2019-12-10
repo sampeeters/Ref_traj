@@ -26,7 +26,7 @@ if (Airport=="EGLL") {
 } else if (Airport=="LSZH") {
   Files=list.files(path = "Data/OSN data/", pattern = paste0("^",Airport, "-adsb-2019-06-.*\\-", Phase, ".csv"))
 }else if (Airport=="EDDF") {
-  Files=list.files(path = "Data/OSN data/", pattern = paste0("^arrivals-",tolower(Airport), "-20190318.csv"))
+  Files=list.files(path = "Data/OSN data/", pattern = paste0("^arrivals-",tolower(Airport), "-2019.*\\", ".csv"))
 }
 
 for (file in Files) {
@@ -35,18 +35,19 @@ for (file in Files) {
 }
 
 Traj_data=mutate(Traj_data, 
-                 EVENT_TIME=as.POSIXct(item_time, origin="1970-01-01"),
-                 Date=format(as.POSIXct(day, origin="1970-01-01"), "%Y-%m-%d"),
+                 EVENT_TIME=as.POSIXct(time, origin="1970-01-01"),
+                 Date=format(as.POSIXct(time, origin="1970-01-01"), "%Y-%m-%d"),
                  FLIGHT_ID=paste(icao24, firstseen, sep="-"),
-                 ALT=item_altitude/0.3048) %>% 
-  rename(LON=item_longitude,
-         LAT=item_latitude,
-         ADES=estarrivalairport
-  ) %>% 
+                 LON=as.numeric(as.character(longitude)),
+                 LAT=as.numeric(as.character(latitude)),
+                 ALT=baroaltitude/0.3048) %>% 
+  rename(ADES=estarrivalairport) %>% 
   arrange(Date, FLIGHT_ID, EVENT_TIME) %>% 
   group_by(FLIGHT_ID) %>% 
   mutate(SEQ_ID=row_number(),
          POINT_DIST_TMP=ifelse(is.na(SP_dist_NM(LON, LAT, lag(LON), lag(LAT))), 0, SP_dist_NM(LON, LAT, lag(LON), lag(LAT))),
          POINT_DIST=cumsum(POINT_DIST_TMP)) %>% 
-  select(-POINT_DIST_TMP)
+  select(-POINT_DIST_TMP) %>% 
+  filter(!is.na(LON) & !is.na(LAT),
+         !is.na(firstseen))
 rm(Traj_data_temp)

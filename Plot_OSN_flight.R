@@ -17,11 +17,11 @@ Country_FIR=subset(Airspaces_2015, TYPE_CODE == "FIR")
 
 Radius=200
 
-Airport="EGLL"
+Airport="EIDW"
 Phase="ARR" # ARR DEP
 source("Read_OSN_data_from_csv.R")
 
-Flight_id="00b1f7-1528309575"
+Flight_id="344495-1562239044"
 
 drv <- dbDriver("Oracle")
 con <- dbConnect(drv, "PRUTEST", "test", dbname='//porape5.ops.cfmu.eurocontrol.be:1521/pe5')
@@ -55,7 +55,7 @@ ggplot() +
   theme(plot.title = element_text(size=40, face="bold", hjust=0.5),
         axis.text=element_text(size=36),
         axis.title=element_text(size=38))
-
+ggsave(paste0(dir_PRU, "Figures/Time_alt_", Flight_id, ".jpeg"), width = 50, height = 30, units = "cm", dpi=200)
 
 # Lateral plot
 

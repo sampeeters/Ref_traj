@@ -12,7 +12,7 @@ dir_PRU="C:/Users/speeters/repos/Ref_traj/"
 Results_all=data.frame()
 Results_radius=data.frame()
 
-Airport="EGLL"
+Airport="EDDF"
 Phase="ARR" # ARR DEP
 
 x_min=-35
@@ -27,7 +27,11 @@ con <- dbConnect(drv, "PRUTEST", "test", dbname='//porape5.ops.cfmu.eurocontrol.
 APT_data <- dbGetQuery(con, "SELECT * FROM SP_AIRPORT_INFO")
 dbDisconnect(con)
 
-source("Read_OSN_data_from_csv.R")
+if (Airport=="EDDF") {
+  source("Read_OSN_data_from_csv2.R")
+} else {
+  source("Read_OSN_data_from_csv.R")
+}
 
 data_temp1=distinct(Traj_data, FLIGHT_ID, EVENT_TIME, .keep_all = TRUE)
 data_temp2=data_temp1 %>% 
